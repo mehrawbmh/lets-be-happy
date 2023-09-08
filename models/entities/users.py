@@ -13,8 +13,8 @@ class User(Entity):
     email: str | None = Field(default=None)
     active: bool = True
 
-    @field_validator(email)
-    def validate_email_regex(self, email: str):
+    @field_validator('email')
+    def validate_email_regex(cls, email: str):
         email_pattern = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
         return re.fullmatch(email_pattern, email)
 
