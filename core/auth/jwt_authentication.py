@@ -15,6 +15,7 @@ class JWTAuthentication:
         self.token = token
 
     def get_user(self):
+        ...
 
 
     @classmethod
