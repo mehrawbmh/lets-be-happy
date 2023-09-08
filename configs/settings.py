@@ -23,5 +23,9 @@ class Settings(BaseSettings):
     BASE_DIR = str(Path(__file__).resolve().parent.parent)
     PROJECT_NAME = str("lets-be-happy")
 
+    SECRET_KEY = str()
+    AUTHORIZATION_HASH_ALGORITHM = str()
+    ACCESS_TOKEN_EXPIRATION_SECONDS = 48 * 60 * 60
+
 
 settings = Settings()
