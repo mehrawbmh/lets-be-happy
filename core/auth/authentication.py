@@ -1,7 +1,6 @@
 from fastapi import Depends
 
-from models.users import User
-from passlib.context import CryptContext
+from models.entities.users import User
 from dependencies.depends import get_main_db
 
 
