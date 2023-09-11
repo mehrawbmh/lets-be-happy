@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.results import InsertOneResult
 
+from configs.settings import settings
 from dependencies import depends
 from models.entities.users import User
 from models.schemas.user.user_signup import UserSignUp
@@ -62,4 +63,4 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(depe
 
 @app.post("/users/login")
 async def log_in(form_data=Depends(OAuth2PasswordRequestForm)):
-    user = JWTAuthentication().get_user()
+    user = JWTAuthentication().login_password()

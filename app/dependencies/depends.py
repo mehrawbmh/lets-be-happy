@@ -3,6 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from core.mongo import MongoClient
 from models.entities.users import User
+from core.auth.jwt_authentication import JWTAuthentication
 from fastapi.security import OAuth2PasswordBearer
 
 
@@ -18,8 +19,4 @@ async def get_current_user(token: str = Depends(OAuth2PasswordBearer("jwt_token"
     """
    :return: current user based on request header token
    """
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="You are not logged in yet",
-        )
+    return JWTAuthentication(token).get_user()

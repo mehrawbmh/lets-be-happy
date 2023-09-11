@@ -1,9 +1,12 @@
-from jose import jwt
+from jose import jwt, JWTError, ExpiredSignatureError
 from configs.settings import settings
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.exceptions import HTTPException
+from fastapi import status
 from datetime import datetime, timedelta
 
+from models.entities.users import User
 from models.schemas.auth.token_data import TokenData
 
 
@@ -15,8 +18,18 @@ class JWTAuthentication:
         self.token = token
 
     def get_user(self):
-        ...
+        if not self.token:
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, {"message": "You have to log in first!"})
+        try:
+            user_data = self.decode()
+        except ExpiredSignatureError:
+            #TODO: redirect
+            return
+        except JWTError:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "Wrong login token given"})
 
+        user_data = TokenData.model_validate(user_data)
+        return User.find_by_username(user_data.username)
 
     @classmethod
     def hash_password(cls, plain_password: str):
