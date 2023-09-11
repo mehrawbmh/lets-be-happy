@@ -1,7 +1,7 @@
 from fastapi import Depends
 
+from dependencies.database import get_main_db
 from models.entities.users import User
-from dependencies.depends import get_main_db
 
 
 # TODO: sanitize, escape or remove and error while getting injection with non-alphanumeric characters
