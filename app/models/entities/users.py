@@ -8,7 +8,6 @@ from models.base import Entity
 
 
 class User(Entity):
-    # TODO: add id?
     id: str | None
     username: str
     password: str

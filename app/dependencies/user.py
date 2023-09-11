@@ -1,6 +1,5 @@
 from fastapi import Depends
-from fastapi.security import HTTPBearer, \
-    HTTPAuthorizationCredentials
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from core.auth.jwt_authentication import JWTAuthentication
 from models.entities.users import User
