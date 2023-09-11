@@ -1,17 +1,17 @@
-from fastapi import FastAPI, Request, Depends, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Depends, status
+from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.results import InsertOneResult
 
-from configs.settings import settings
-from dependencies import depends
-from models.entities.users import User
-from models.schemas.user.user_signup import UserSignUp
-from fastapi.exceptions import HTTPException
 from core.auth.jwt_authentication import JWTAuthentication
-from fastapi.security import OAuth2PasswordRequestForm
-
+from dependencies.database import get_main_db
+from dependencies.user import get_current_user
+from models.entities.users import User
+from models.schemas.user.user_login import UserLogin
+from models.schemas.user.user_signup import UserSignUp
 
 app = FastAPI()
 
@@ -44,7 +44,7 @@ async def say_hello(name: str, message: str = ''):
 
 
 @app.post("/users/signup")
-async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(depends.get_main_db)):
+async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_main_db)):
     # TODO: move it to handler or sth, validate basic password rules, add response model, check email, etc
     existing = await db.users.find_one({"username": user_info.username})
     if existing:
@@ -61,6 +61,17 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(depe
     )
 
 
+@app.post("/users/login1")
+async def log_in(form_data: OAuth2PasswordRequestForm = Depends()):  # TODO: check it and remove it later
+    return await JWTAuthentication().login_with_password(form_data.username, form_data.password)
+
+
 @app.post("/users/login")
-async def log_in(form_data=Depends(OAuth2PasswordRequestForm)):
-    user = JWTAuthentication().login_password()
+async def login(user: UserLogin):
+    return await JWTAuthentication().login_with_password(user.username, user.password)
+
+
+@app.post("/users/token")
+async def check_token(user: User = Depends(get_current_user)):
+    print('user:', user)
+    return {'OK': 1}
