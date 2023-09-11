@@ -9,7 +9,7 @@ from models.base import Entity
 
 class User(Entity):
     # TODO: add id?
-    id: str
+    id: str | None
     username: str
     password: str
     role: str = Role.USER
@@ -29,4 +29,7 @@ class User(Entity):
             return
 
         email_pattern = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-        return re.fullmatch(email_pattern, email)
+        if re.fullmatch(email_pattern, email):
+            return email
+
+        return
