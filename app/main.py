@@ -53,7 +53,7 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_
             {"message": "This user exists! Try other usernames"},
         )
     user_info.password = JWTAuthentication.hash_password(user_info.password)
-    user = User.model_validate(user_info.model_dump())
+    user = User.model_validate({**user_info.model_dump(), 'id': None})
     result: InsertOneResult = await db.users.insert_one(user.model_dump())
     return JSONResponse(
         {"success": result.acknowledged, "_id": str(result.inserted_id) if result.inserted_id else None},
