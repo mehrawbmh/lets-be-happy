@@ -12,6 +12,7 @@ class User(Entity):
     id: str | None
     username: str
     password: str
+    phone: str = Field(min_length=11, max_length=11)
     role: str = Role.USER
     email: str | None = Field(default=None)
     active: bool = True
