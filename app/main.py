@@ -10,6 +10,7 @@ from core.auth.jwt_authentication import JWTAuthentication
 from dependencies.database import get_main_db
 from dependencies.user import get_current_user
 from models.entities.users import User
+from models.schemas.auth.token_data import TokenData
 from models.schemas.user.user_login import UserLogin
 from models.schemas.user.user_signup import UserSignUp
 
@@ -52,6 +53,7 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_
             status.HTTP_400_BAD_REQUEST,
             {"message": "This user exists! Try other usernames"},
         )
+
     user_info.password = JWTAuthentication.hash_password(user_info.password)
     user = User.model_validate({**user_info.model_dump(), 'id': None})
     result: InsertOneResult = await db.users.insert_one(user.model_dump())
@@ -73,5 +75,4 @@ async def login(user: UserLogin):
 
 @app.post("/users/token")
 async def check_token(user: User = Depends(get_current_user)):
-    print('user:', user)
-    return {'OK': 1}
+    return TokenData(username=user.username, id=user.id)
