@@ -9,7 +9,7 @@ class Settings(BaseSettings):
         """
         Config .env file for project credential and environment stuff
         """
-        env_file = '.env'
+        env_file = '.env'  # TODO why not working in app directory?
         env_file_encoding = 'utf-8'
         fields_list = ['SECRET_KEY', 'MONGO_HOST', 'MONGO_USERNAME', 'MONGO_PORT', 'MONGO_PASSWORD', 'MONGO_DB']
         fields = {item: {'env': item} for item in fields_list}
