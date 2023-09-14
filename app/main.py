@@ -82,6 +82,7 @@ async def check_token(user: User = Depends(get_current_user)):
     return TokenData(username=user.username, id=user.id)
 
 
+@router.get('/users/me')
 async def profile(user: User = Depends(get_current_user)):
     return UserProfile.model_validate(user.model_dump())
 
