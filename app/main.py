@@ -12,6 +12,7 @@ from app.dependencies.user import get_current_user
 from app.models.entities.users import User
 from app.models.schemas.auth.token_data import TokenData
 from app.models.schemas.user.user_login import UserLogin
+from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_signup import UserSignUp
 
 app = FastAPI()
@@ -79,6 +80,10 @@ async def login(user: UserLogin):
 @router.post("/users/token")
 async def check_token(user: User = Depends(get_current_user)):
     return TokenData(username=user.username, id=user.id)
+
+
+async def profile(user: User = Depends(get_current_user)):
+    return UserProfile.model_validate(user.model_dump())
 
 
 app.include_router(router)
