@@ -1,0 +1,28 @@
+services:
+  app:
+    restart: always
+    container_name: "lbh_container"
+    build: .
+    command: uvicorn app.main:app --loop asyncio --port 8000 --host 0.0.0.0
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - public
+
+  db:
+    image: "mongo:latest"
+    container_name: "mongo_container"
+    volumes:
+      - ./data:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - public
+
+
+networks:
+  public:
