@@ -29,7 +29,5 @@ class User(Entity):
             return
 
         email_pattern = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
-        if re.fullmatch(email_pattern, email):
-            return email
-
-        return
+        assert re.fullmatch(email_pattern, email), "email is not in valid format!"
+        return email
