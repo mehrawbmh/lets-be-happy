@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, Depends, status, APIRouter
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -15,6 +15,7 @@ from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_signup import UserSignUp
 
 app = FastAPI()
+router = APIRouter(prefix='/api')
 
 origins = ["*"]
 
@@ -27,17 +28,12 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@router.get("/")
 async def root():
     return {"message": "Let's be happy."}
 
 
-@app.get("/api")
-async def root():
-    return {"message": "Let's be happy again."}
-
-
-@app.get("/hello/{name}")
+@router.get("/hello/{name}")
 async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = Depends(get_main_db)):
     test_recode = await db.users.find_one({})
     print('test:', test_recode, sep=' ')
@@ -51,7 +47,7 @@ async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = D
     return response
 
 
-@app.post("/users/signup")
+@router.post("/users/signup")
 async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_main_db)):
     # TODO: move it to handler or sth, validate basic password rules, add response model, check email, etc
     existing = await db.users.find_one({"username": user_info.username})
@@ -70,16 +66,19 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_
     )
 
 
-@app.post("/users/login1")
+@router.post("/users/login1")
 async def log_in(form_data: OAuth2PasswordRequestForm = Depends()):  # TODO: check it and remove it later
     return await JWTAuthentication().login_with_password(form_data.username, form_data.password)
 
 
-@app.post("/users/login")
+@router.post("/users/login")
 async def login(user: UserLogin):
     return await JWTAuthentication().login_with_password(user.username, user.password)
 
 
-@app.post("/users/token")
+@router.post("/users/token")
 async def check_token(user: User = Depends(get_current_user)):
     return TokenData(username=user.username, id=user.id)
+
+
+app.include_router(router)
