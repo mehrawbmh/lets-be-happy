@@ -33,7 +33,9 @@ async def root():
 
 
 @app.get("/hello/{name}")
-async def say_hello(name: str, message: str = ''):
+async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = Depends(get_main_db)):
+    test_recode = await db.users.find_one({})
+    print('test:', test_recode, sep=' ')
     message = 'you said ' + message if message else ''
 
     resp = {
