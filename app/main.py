@@ -6,6 +6,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.results import InsertOneResult
 
+from app.configs.roles import Role
 from app.core.auth.jwt_authentication import JWTAuthentication
 from app.dependencies.database import get_main_db
 from app.dependencies.user import get_current_user
@@ -85,6 +86,20 @@ async def check_token(user: User = Depends(get_current_user)):
 @router.get('/users/me')
 async def profile(user: User = Depends(get_current_user)):
     return UserProfile.model_validate(user.model_dump())
+
+
+@router.get('/users/list')
+async def list_users(user: User = Depends(get_current_user), db: AsyncIOMotorDatabase = Depends(get_main_db)):
+    if user.role != Role.ADMIN:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, {'message': "you can't see our users god damn you!"})
+
+    users = db.users.find({})
+    final = []
+    for user in await users.to_list(length=100):
+        user = User.model_validate({**user, 'id': str(user['_id'])})
+        final.append(user)
+
+    return final
 
 
 app.include_router(router)
