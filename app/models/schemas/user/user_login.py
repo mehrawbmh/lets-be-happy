@@ -1,4 +1,4 @@
-from models.base import Schema
+from app.models.base import Schema
 
 
 class UserLogin(Schema):

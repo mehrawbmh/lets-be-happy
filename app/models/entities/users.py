@@ -2,9 +2,9 @@ import re
 
 from pydantic import Field, field_validator
 
-from configs.roles import Role
-from dependencies.database import get_main_db
-from models.base import Entity
+from app.configs.roles import Role
+from app.dependencies.database import get_main_db
+from app.models.base import Entity
 
 
 class User(Entity):

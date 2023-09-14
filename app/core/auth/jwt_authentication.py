@@ -6,10 +6,10 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
 from passlib.context import CryptContext
 
-from configs.settings import settings
-from models.entities.users import User
-from models.schemas.auth.token import Token
-from models.schemas.auth.token_data import TokenData
+from app.configs.settings import settings
+from app.models.entities.users import User
+from app.models.schemas.auth.token import Token
+from app.models.schemas.auth.token_data import TokenData
 
 
 class JWTAuthentication:
@@ -41,7 +41,7 @@ class JWTAuthentication:
             raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "Wrong login token given"})
 
         user_data = TokenData.model_validate(user_data)
-        return user_data
+        return User.find_by_username(user_data.username)
 
     @classmethod
     def hash_password(cls, plain_password: str):

@@ -1,5 +1,6 @@
-from configs.settings import settings
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+
+from app.configs.settings import settings
 
 
 # TODO: make it singleton

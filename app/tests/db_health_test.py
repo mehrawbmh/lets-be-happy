@@ -1,6 +1,6 @@
 from asyncio import run
 
-from dependencies.database import get_main_db
+from app.dependencies.database import get_main_db
 
 
 async def test_function():

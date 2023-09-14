@@ -1,8 +1,8 @@
 from fastapi import Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from core.auth.jwt_authentication import JWTAuthentication
-from models.entities.users import User
+from app.core.auth.jwt_authentication import JWTAuthentication
+from app.models.entities.users import User
 
 
 async def get_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> str:
@@ -17,4 +17,4 @@ async def get_current_user(token: str = Depends(get_token)) -> User:
     """
    :return: current user based on request header token
    """
-    return JWTAuthentication(token).get_user()
+    return await JWTAuthentication(token).get_user()

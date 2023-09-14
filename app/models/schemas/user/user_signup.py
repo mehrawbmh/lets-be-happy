@@ -1,6 +1,6 @@
 from pydantic import Field
 
-from models.base import Schema
+from app.models.base import Schema
 
 
 class UserSignUp(Schema):

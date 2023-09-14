@@ -1,6 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from core.mongo import MongoClient
+from app.core.database.mongo import MongoClient
 
 
 async def get_main_db() -> AsyncIOMotorDatabase:

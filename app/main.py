@@ -6,13 +6,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.results import InsertOneResult
 
-from core.auth.jwt_authentication import JWTAuthentication
-from dependencies.database import get_main_db
-from dependencies.user import get_current_user
-from models.entities.users import User
-from models.schemas.auth.token_data import TokenData
-from models.schemas.user.user_login import UserLogin
-from models.schemas.user.user_signup import UserSignUp
+from app.core.auth.jwt_authentication import JWTAuthentication
+from app.dependencies.database import get_main_db
+from app.dependencies.user import get_current_user
+from app.models.entities.users import User
+from app.models.schemas.auth.token_data import TokenData
+from app.models.schemas.user.user_login import UserLogin
+from app.models.schemas.user.user_signup import UserSignUp
 
 app = FastAPI()
 
