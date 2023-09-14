@@ -32,6 +32,11 @@ async def root():
     return {"message": "Let's be happy."}
 
 
+@app.get("/api")
+async def root():
+    return {"message": "Let's be happy again."}
+
+
 @app.get("/hello/{name}")
 async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = Depends(get_main_db)):
     test_recode = await db.users.find_one({})
