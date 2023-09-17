@@ -35,12 +35,14 @@ class MongoClient:
     async def get_main_db(self) -> AsyncIOMotorDatabase:
         if not self.__db:
             self.__client = await self.get_client() if not self.__client else self.__client
-            dblist = await self.__client.list_database_names()
+            self.__db = self.__client.get_database(settings.MONGO_DB)
 
+            dblist = await self.__client.list_database_names()
             if settings.MONGO_DB in dblist:
                 self.__db = self.__client.get_database(settings.MONGO_DB)
-                return self.__db
-
-            raise Exception("Database not found!!")  # TODO: make it connectionException or something like that
+            else:
+                self.__db = self.__client[settings.MONGO_DATABASE]
+                print("WARNING>>> creating DB!")
+                await self.__db["init"].update_one({}, {"$set": {"OK": 1}}, upsert=True)
 
         return self.__db
