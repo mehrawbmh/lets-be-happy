@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.core.auth.jwt_authentication import JWTAuthentication
@@ -9,7 +9,6 @@ async def get_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBear
     """
      :return: token given in request header if it's bearer, else empty string
      """
-
     return credentials.credentials if credentials.scheme == "Bearer" else ""
 
 
@@ -17,4 +16,7 @@ async def get_current_user(token: str = Depends(get_token)) -> User:
     """
    :return: current user based on request header token
    """
-    return await JWTAuthentication(token).get_user()
+    if user := await JWTAuthentication(token).get_user():
+        return user
+
+    raise HTTPException(status.HTTP_404_NOT_FOUND, 'user id in token not found!')
