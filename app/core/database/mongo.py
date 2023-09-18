@@ -18,7 +18,7 @@ class MongoClient:
         host_name = getattr(settings, "MONGO_HOST", "")
         port = getattr(settings, "MONGO_PORT", "")
 
-        if password:  # it means there's auth!
+        if username and password:  # it means there's auth!
             connection_uri = f"mongodb://{username}:{password}@{host_name}:{port}/{settings.MONGO_DB}"
         else:
             connection_uri = f"mongodb://{host_name}:{port}/{settings.MONGO_DB}"
@@ -41,7 +41,7 @@ class MongoClient:
             if settings.MONGO_DB in dblist:
                 self.__db = self.__client.get_database(settings.MONGO_DB)
             else:
-                self.__db = self.__client[settings.MONGO_DATABASE]
+                self.__db = self.__client[settings.MONGO_DB]
                 print("WARNING>>> creating DB!")
                 await self.__db["init"].update_one({}, {"$set": {"OK": 1}}, upsert=True)
 
