@@ -15,27 +15,26 @@ class MongoClient:
     async def __get_uri():
         username = getattr(settings, "MONGO_USERNAME", None)
         password = getattr(settings, "MONGO_PASSWORD", None)
-        host_name = getattr(settings, "MONGO_HOST", "")
-        port = getattr(settings, "MONGO_PORT", "")
-
+        host_name = getattr(settings, "MONGO_HOST", 'localhost')
+        port = getattr(settings, "MONGO_PORT", "27017")
+        print('setting:', settings)
         if username and password:  # it means there's auth!
-            connection_uri = f"mongodb://{username}:{password}@{host_name}:{port}/{settings.MONGO_DB}"
+            connection_uri = f"mongodb://{username}:{password}@{host_name}:27017"
         else:
-            connection_uri = f"mongodb://{host_name}:{port}/{settings.MONGO_DB}"
-
+            connection_uri = f"mongodb://{host_name}:27017/"
+        print('uri:', connection_uri)
         return connection_uri
 
     @classmethod
     async def get_client(cls) -> AsyncIOMotorClient:
         return AsyncIOMotorClient(
             await cls.__get_uri(),
-            serverSelectionTimeoutMS=3000
+            serverSelectionTimeoutMS=10000
         )
 
     async def get_main_db(self) -> AsyncIOMotorDatabase:
         if not self.__db:
             self.__client = await self.get_client() if not self.__client else self.__client
-            self.__db = self.__client.get_database(settings.MONGO_DB)
 
             dblist = await self.__client.list_database_names()
             if settings.MONGO_DB in dblist:
