@@ -2,9 +2,7 @@ from fastapi import FastAPI, Depends, status, APIRouter
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from pymongo.results import InsertOneResult
 
 from app.configs.roles import Role
 from app.core.auth.jwt_authentication import JWTAuthentication
@@ -42,7 +40,7 @@ async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = D
     message = 'you said ' + message if message else ''
 
     resp = {
-        'message': f"Hello {name}. It's working bro ^_^. {message}"
+        'message': f"Hello {name}. It's working fine ^_^. {message}"
     }
     response = JSONResponse(resp, 200)
 
@@ -61,16 +59,11 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_
 
     user_info.password = JWTAuthentication.hash_password(user_info.password)
     user = User.model_validate({**user_info.model_dump(), 'id': None})
-    result: InsertOneResult = await db.users.insert_one(user.model_dump(exclude={'id'}))
+    result = await user.insert()
     return JSONResponse(
         {"success": result.acknowledged, "_id": str(result.inserted_id) if result.inserted_id else None},
         status.HTTP_201_CREATED,
     )
-
-
-@router.post("/users/login1")
-async def log_in(form_data: OAuth2PasswordRequestForm = Depends()):  # TODO: check it and remove it later
-    return await JWTAuthentication().login_with_password(form_data.username, form_data.password)
 
 
 @router.post("/users/login")

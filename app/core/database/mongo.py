@@ -17,12 +17,10 @@ class MongoClient:
         password = getattr(settings, "MONGO_PASSWORD", None)
         host_name = getattr(settings, "MONGO_HOST", 'localhost')
         port = getattr(settings, "MONGO_PORT", "27017")
-        print('setting:', settings)
         if username and password:  # it means there's auth!
             connection_uri = f"mongodb://{username}:{password}@{host_name}:27017"
         else:
             connection_uri = f"mongodb://{host_name}:27017/"
-        print('uri:', connection_uri)
         return connection_uri
 
     @classmethod
