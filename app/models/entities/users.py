@@ -5,7 +5,6 @@ from pydantic import Field, field_validator
 from starlette import status
 
 from app.configs.roles import Role
-from app.dependencies.database import get_main_db
 from app.models.base import Entity
 
 
@@ -23,15 +22,14 @@ class User(Entity):
 
     @classmethod
     async def find_by_username(cls, username: str):
-        db = await get_main_db()  # TODO: find better way to inject db here
-        db_data = await db.users.find_one({"username": username})
-
-        return cls.__convert_document_to_object(db_data)
+        collection = await cls.get_collection()
+        db_data = await collection.find_one({"username": username})
+        return cls._convert_document_to_object(db_data)
 
     @field_validator('email')
     def validate_email_regex(cls, email: str | None = None):
-        if email is None:
-            return
+        if not email:
+            return None
 
         email_pattern = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')
         if not re.fullmatch(email_pattern, email):
