@@ -52,7 +52,7 @@ class Entity(BaseModel, ABC):
         return await collection.insert_one(self.model_dump(exclude=exclude))
 
     @classmethod
-    def __convert_document_to_object(cls, db_data: dict | None) -> Self:
+    def _convert_document_to_object(cls, db_data: dict | None) -> Self:
         return cls.model_validate({**db_data, 'id': str(db_data['_id'])}) if db_data else None
 
 
