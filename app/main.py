@@ -4,10 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from app.configs.roles import Role
 from app.core.auth.jwt_authentication import JWTAuthentication
 from app.dependencies.database import get_main_db
-from app.dependencies.user import get_current_user
+from app.dependencies.user import get_current_user, get_admin_user
 from app.models.entities.users import User
 from app.models.schemas.auth.token_data import TokenData
 from app.models.schemas.user.user_login import UserLogin
@@ -82,10 +81,7 @@ async def profile(user: User = Depends(get_current_user)):
 
 
 @router.get('/users/list')
-async def list_users(user: User = Depends(get_current_user), db: AsyncIOMotorDatabase = Depends(get_main_db)):
-    if user.role != Role.ADMIN:
-        raise HTTPException(status.HTTP_403_FORBIDDEN, {'message': "you can't see our users god damn you!"})
-
+async def list_users(user: User = Depends(get_admin_user), db: AsyncIOMotorDatabase = Depends(get_main_db)):
     users = db.users.find({})
     final = []
     for user in await users.to_list(length=100):
