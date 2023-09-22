@@ -39,7 +39,7 @@ async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = D
     message = 'you said ' + message if message else ''
 
     resp = {
-        'message': f"Hello {name}. It's working fine ^_^. {message}"
+        'message': f"Hello {name}. It seems working fine ^_^. {message}"
     }
     response = JSONResponse(resp, 200)
 
