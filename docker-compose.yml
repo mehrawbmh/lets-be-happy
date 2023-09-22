@@ -3,6 +3,8 @@ services:
     restart: always
     container_name: "lbh_container"
     build: .
+    volumes:
+      - ./:/app/
     command: uvicorn app.main:app --loop asyncio --port 8000 --host 0.0.0.0
     ports:
       - 8000:8000

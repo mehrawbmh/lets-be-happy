@@ -29,7 +29,7 @@ app.add_middleware(
 
 @router.get("/")
 async def root():
-    return {"message": "Let's be happy."}
+    return {"message": "Let's be happy yo."}
 
 
 @router.get("/hello/{name}")
