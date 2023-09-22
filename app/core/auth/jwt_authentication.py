@@ -36,7 +36,7 @@ class JWTAuthentication:
             user_data = self.decode()
         except ExpiredSignatureError:
             # TODO: redirect
-            return
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, {"message": "You have to log in first!"})
         except JWTError:
             raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "Wrong login token given"})
 
