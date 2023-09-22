@@ -17,7 +17,7 @@ class Entity(BaseModel, ABC):
     """
     id: str | None
     active: bool = True
-    created_at: str = Field(default=str(datetime.datetime.now()))
+    created_at: str = Field(default=str(datetime.datetime.utcnow()))
 
     @staticmethod
     @abstractmethod
