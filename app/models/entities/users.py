@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from pydantic import Field, field_validator
 from starlette import status
 
-from app.configs.roles import Role
+from app.core.enum.roles import Role
 from app.models.base import Entity
 
 

@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.core.auth.jwt_authentication import JWTAuthentication
+from app.core.enum.access_levels import AccessLevel
 from app.dependencies.database import get_main_db
 from app.dependencies.user import get_current_user, get_admin_user
 from app.models.entities.users import User
@@ -34,6 +35,7 @@ async def root():
 
 @router.get("/hello/{name}")
 async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = Depends(get_main_db)):
+    print('role:', AccessLevel.USER.value)
     test_recode = await db.users.find_one({})
     print('test:', test_recode, sep=' ')
     message = 'you said ' + message if message else ''

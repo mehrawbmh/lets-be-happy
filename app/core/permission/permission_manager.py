@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 
+from app.core.enum.access_levels import AccessLevel
 from app.models.entities.users import User
-from .access_levels import AccessLevel
 
 
 class PermissionManager:
