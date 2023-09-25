@@ -1,4 +1,3 @@
-import datetime
 from abc import ABC, abstractmethod
 from typing import Self
 
@@ -7,6 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from pydantic import BaseModel, Field
 from pymongo.results import InsertOneResult
 
+from app.core.services.time_service import TimeService
 from app.dependencies.database import get_main_db
 
 
@@ -17,12 +17,12 @@ class Entity(BaseModel, ABC):
     """
     id: str | None
     active: bool = True
-    created_at: str = Field(default=str(datetime.datetime.utcnow()))
+    created_at: str = Field(default=str(TimeService.get_now()))
 
     @staticmethod
     @abstractmethod
     def get_collection_name():
-        raise Exception('You must implement this method!!')
+        raise NotImplementedError('You must implement this method!!')
 
     @staticmethod
     async def get_db() -> AsyncIOMotorDatabase:

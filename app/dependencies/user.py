@@ -31,3 +31,4 @@ async def get_admin_user(user: User = Depends(get_current_user)):
 
 async def get_staff_user(user: User = Depends(get_current_user)):
     PermissionManager(user).permit(AccessLevel.STAFF)
+    return user

@@ -7,9 +7,10 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.core.auth.jwt_authentication import JWTAuthentication
 from app.core.enum.access_levels import AccessLevel
 from app.dependencies.database import get_main_db
-from app.dependencies.user import get_current_user, get_admin_user
+from app.dependencies.user import get_current_user, get_admin_user, get_staff_user
 from app.models.entities.users import User
 from app.models.schemas.auth.token_data import TokenData
+from app.models.schemas.task.task_create import CreateTask
 from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_signup import UserSignUp
@@ -91,6 +92,14 @@ async def list_users(user: User = Depends(get_admin_user), db: AsyncIOMotorDatab
         final.append(user)
 
     return final
+
+
+@router.post('/tasks/create')
+async def create_task(task_input: CreateTask, user: User = Depends(get_staff_user),
+                      db: AsyncIOMotorDatabase = Depends(get_main_db)):
+    print(task_input.model_dump())
+    return {'ok': 1}
+    # task: Task = Task.model_validate(task_input.model_dump())
 
 
 app.include_router(router)
