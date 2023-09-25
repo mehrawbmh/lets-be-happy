@@ -16,6 +16,7 @@ services:
       - public
 
   db:
+    restart: always
     image: "mongo:latest"
     container_name: "mongo_container"
     volumes:
