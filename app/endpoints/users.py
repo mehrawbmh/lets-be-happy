@@ -6,7 +6,6 @@ from app.core.auth.jwt_authentication import JWTAuthentication
 from app.dependencies.database import get_main_db
 from app.dependencies.user import get_current_user, get_admin_user
 from app.models.entities.users import User
-from app.models.schemas.auth.token_data import TokenData
 from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_signup import UserSignUp
@@ -38,11 +37,6 @@ async def login(user: UserLogin):
     return await JWTAuthentication().login_with_password(user.username, user.password)
 
 
-@router.post("/token")
-async def check_token(user: User = Depends(get_current_user)):
-    return TokenData(username=user.username, id=user.id)
-
-
 @router.get('/me')
 async def profile(user: User = Depends(get_current_user)):
     return UserProfile.model_validate(user.model_dump())
@@ -54,6 +48,6 @@ async def list_users(user: User = Depends(get_admin_user), db: AsyncIOMotorDatab
     final = []
     for user in await users.to_list(length=100):
         user = User.model_validate({**user, 'id': str(user['_id'])})
-        final.append(user)
+        final.append(user.model_dump(exclude={'password'}))
 
     return final
