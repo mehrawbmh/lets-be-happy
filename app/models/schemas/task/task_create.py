@@ -4,7 +4,7 @@ from typing_extensions import Literal
 
 from app.core.enum.task_priorities import TaskPriority
 from app.core.services.time_service import TimeService
-from app.models.base import Schema
+from app.models.schema import Schema
 
 
 class CreateTask(Schema):

@@ -5,7 +5,7 @@ from pydantic import Field, field_validator
 from starlette import status
 
 from app.core.enum.roles import Role
-from app.models.base import Entity
+from app.models.entity import Entity
 
 
 class User(Entity):

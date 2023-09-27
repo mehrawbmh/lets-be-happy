@@ -1,4 +1,4 @@
-from app.models.base import Schema
+from app.models.schema import Schema
 
 
 class UserProfile(Schema):

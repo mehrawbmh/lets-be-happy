@@ -4,7 +4,7 @@ from pydantic import Field
 
 from app.core.enum.task_priorities import TaskPriority
 from app.core.enum.task_statuses import TaskStatus
-from app.models.base import Entity
+from app.models.entity import Entity
 
 
 class Task(Entity):
