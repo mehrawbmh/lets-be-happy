@@ -17,6 +17,7 @@ async def root():
 
 @router.get("/hello/{name}")
 async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = Depends(get_main_db)):
+    print('new version')
     message = 'you said ' + message if message else ''
     resp = {
         'message': f"Hello {name}. It seems working fine ^_^. {message}"
