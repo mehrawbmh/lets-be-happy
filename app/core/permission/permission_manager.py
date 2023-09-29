@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status
 
 from app.core.enum.access_levels import AccessLevel
-from app.models.entities.users import User
+from app.models.schemas.auth.token_data import TokenData
 
 
 class PermissionManager:
-    def __init__(self, user: User | None = None):
+    def __init__(self, user: TokenData | None = None):
         self.user = user
 
     def permit(self, access_level: AccessLevel):
