@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.core.database.mongo import MongoClient
+from app.core.enum.event_types import EventTypes
 from app.dependencies.database import get_main_db
 from app.endpoints.tasks import router as tasks_router
 from app.endpoints.users import router as users_router
@@ -30,6 +32,7 @@ router.include_router(tasks_router)
 
 app = FastAPI()
 app.include_router(router)
+app.add_event_handler(EventTypes.STARTUP, MongoClient.crete_indexes)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],

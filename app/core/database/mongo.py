@@ -1,4 +1,7 @@
+from typing import NoReturn
+
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from pymongo import ASCENDING
 
 from app.configs.settings import settings
 
@@ -45,3 +48,32 @@ class MongoClient:
                 await self.__db["init"].update_one({}, {"$set": {"OK": 1}}, upsert=True)
 
         return self.__db
+
+    async def crete_indexes(self) -> NoReturn:
+        """
+        Create proper indexes for each entity if not exist #TODO: move each logic per entity
+        """
+        db = await self.get_main_db()
+        print('here on startup!')
+        return
+
+        await db.users.create_index(
+            [("username", ASCENDING)],
+            name="username",
+            unique=True,
+            background=True
+        )
+
+        await db.users.create_index(
+            [("email", ASCENDING)],
+            name="email",
+            unique=True,
+            background=True
+        )
+
+        await db.tasks.create_index(
+            [("assignee", ASCENDING)],
+            name="assignee",
+            unique=True,
+            background=True
+        )
