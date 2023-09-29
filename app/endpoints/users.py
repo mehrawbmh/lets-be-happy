@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.core.auth.jwt_authentication import JWTAuthentication
+from app.core.enum.roles import Role
+from app.core.enum.tags import Tags
 from app.core.services.response_service import responseService
 from app.dependencies.database import get_main_db
 from app.dependencies.user import get_current_user, get_admin_user
@@ -11,7 +13,7 @@ from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_signup import UserSignUp
 
-router = APIRouter(prefix='/users')
+router = APIRouter(prefix='/users', tags=[Tags.USER, Tags.AUTH])
 
 
 @router.post("/signup")
@@ -51,3 +53,8 @@ async def list_users(user: TokenData = Depends(get_admin_user), db: AsyncIOMotor
         final.append(user.model_dump(exclude={'password'}))
 
     return final
+
+
+@router.patch('/promote')
+async def promote_user_role(role: Role, admin_user: TokenData = Depends(get_admin_user)):
+    ...
