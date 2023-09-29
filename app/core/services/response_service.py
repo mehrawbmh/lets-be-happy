@@ -1,7 +1,7 @@
 from typing import Any
 
 from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from starlette.datastructures import URL
 
 from app.core.services.service import Service
@@ -38,7 +38,7 @@ class ResponseService(Service):
         )
 
     def success_204(self):
-        return JSONResponse(self.__create_success_detail(), status.HTTP_204_NO_CONTENT)
+        return Response(None, status.HTTP_204_NO_CONTENT)
 
     def redirect_304(self, url: str):
         url = URL(url)
@@ -72,6 +72,12 @@ class ResponseService(Service):
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             self.__create_error_detail(message)
+        )
+
+    def error_501(self):
+        raise HTTPException(
+            status.HTTP_501_NOT_IMPLEMENTED,
+            self.__create_error_detail('this feature is not implemented yet. try later =)')
         )
 
 
