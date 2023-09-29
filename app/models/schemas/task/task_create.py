@@ -9,6 +9,7 @@ from app.models.schema import Schema
 
 
 class CreateTask(Schema):
+    title: str
     assignee_username: str
     deadline: datetime = TimeService.get_today_end()
     status: Literal[TaskStatus.BACKLOG, TaskStatus.IN_PROGRESS] = TaskStatus.BACKLOG

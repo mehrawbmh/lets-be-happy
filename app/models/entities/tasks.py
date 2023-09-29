@@ -12,6 +12,7 @@ class Task(Entity):
     def get_collection_name():
         return 'tasks'
 
+    title: str
     created_by: str  # username # TODO: is it better idea to change it to user id?!
     assignee: str  # username
     deadline: datetime
