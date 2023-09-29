@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.core.auth.jwt_authentication import JWTAuthentication
+from app.core.services.response_service import responseService
 from app.dependencies.database import get_main_db
 from app.dependencies.user import get_current_user, get_admin_user
 from app.models.entities.users import User
@@ -18,19 +18,17 @@ router = APIRouter(prefix='/users')
 async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_main_db)):
     # TODO: move it to handler or sth, validate basic password rules, add response model, check email, etc
     existing = await db.users.find_one({"username": user_info.username})
+    # TODO: also check duplicate phone (or email?) with unique mongo index error?
     if existing:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            {"message": "This user exists! Try other usernames"},
-        )
+        return responseService.error_400("This username exists! Try other usernames")
 
     user_info.password = JWTAuthentication.hash_password(user_info.password)
     user = User.model_validate({**user_info.model_dump(), 'id': None})
+
     result = await user.insert()
-    return JSONResponse(
-        {"success": result.acknowledged, "_id": str(result.inserted_id) if result.inserted_id else None},
-        status.HTTP_201_CREATED,
-    )
+    if not result.acknowledged:
+        return responseService.error_500()
+    return responseService.success_201({"success": True, "id": str(result.inserted_id)})
 
 
 @router.post("/login")
