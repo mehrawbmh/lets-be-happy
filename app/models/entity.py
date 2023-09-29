@@ -15,7 +15,7 @@ class Entity(BaseModel, ABC):
         This is for models which are DB documents (same as SQL tables) -  all entities of our application
         todo: add orm methods and stuff to it + getter setters
     """
-    id: str | None
+    id: str | None = None
     active: bool = True
     created_at: str = Field(default=str(TimeService.get_now()))
 
