@@ -5,6 +5,7 @@ from app.core.auth.jwt_authentication import JWTAuthentication
 from app.core.enum.access_levels import AccessLevel
 from app.core.permission.permission_manager import PermissionManager
 from app.models.entities.users import User
+from app.models.schemas.auth.token_data import TokenData
 
 
 async def get_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())) -> str:
@@ -14,11 +15,11 @@ async def get_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBear
     return credentials.credentials if credentials.scheme == "Bearer" else ""
 
 
-async def get_current_user(token: str = Depends(get_token)) -> User:
+async def get_current_user(token: str = Depends(get_token)) -> TokenData:
     """
    :return: current user based on request header token
    """
-    if user := await JWTAuthentication(token).get_user():
+    if user := JWTAuthentication(token).get_user():
         return user
 
     raise HTTPException(status.HTTP_404_NOT_FOUND, {'message': 'user id in token not found!'})

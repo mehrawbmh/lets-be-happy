@@ -41,7 +41,7 @@ class JWTAuthentication:
             raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "Wrong login token given"})
 
         user_data = TokenData.model_validate(user_data)
-        return User.find_by_id(user_data.id)
+        return user_data
 
     @classmethod
     def hash_password(cls, plain_password: str):
