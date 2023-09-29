@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 from typing import Self
 
 from bson import ObjectId
+from bson.errors import InvalidId
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from pydantic import BaseModel, Field
 from pymongo.results import InsertOneResult
 
+from app.core.services.response_service import responseService
 from app.core.services.time_service import TimeService
 from app.dependencies.database import get_main_db
 
@@ -34,16 +36,28 @@ class Entity(BaseModel, ABC):
         return db[cls.get_collection_name()]
 
     @classmethod
-    async def find_by_id(cls, document_id: str):
+    def create_object_id(cls, document_id: str):
+        try:
+            return ObjectId(document_id)
+        except InvalidId:
+            return False  # TODO: take other actions?
+
+    @classmethod
+    async def find_by_id(cls, document_id: str, allow_none: bool = True,
+                         not_found_error_message: str = 'invalid id provided.') -> Self | None:
         collection = await cls.get_collection()
-        db_data = await collection.find_one({"_id": ObjectId(document_id)})
+        db_data = await collection.find_one({"_id": cls.create_object_id(document_id)})
+
+        if (not db_data) and (not allow_none):
+            return responseService.error_404(not_found_error_message)
 
         return cls.model_validate({**db_data, 'id': str(db_data['_id'])}) if db_data else None
 
     @classmethod
-    async def find_many(cls, condition: dict, max_length: int = 1000):
+    async def list_find_many(cls, condition: dict, max_length: int = 1000) -> list[Self]:
         collection = await cls.get_collection()
-        return await collection.find(condition).to_list(max_length)
+        documents = await collection.find(condition).to_list(max_length)
+        return list(map(lambda doc: cls._convert_document_to_object(doc), documents))
 
     async def insert(self, exclude: set | None = None) -> InsertOneResult:
         exclude = exclude if exclude else set()
