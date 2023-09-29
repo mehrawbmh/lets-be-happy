@@ -25,6 +25,25 @@ class ResponseService(Service):
 
         return content
 
+    def success_200(self, content='successfully done'):
+        return JSONResponse(
+            self.__create_success_detail(content),
+            status.HTTP_200_OK
+        )
+
+    def success_201(self, content: Any = 'successfully created'):
+        return JSONResponse(
+            self.__create_success_detail(content),
+            status.HTTP_201_CREATED
+        )
+
+    def success_204(self):
+        return JSONResponse(self.__create_success_detail(), status.HTTP_204_NO_CONTENT)
+
+    def redirect_304(self, url: str):
+        url = URL(url)
+        return RedirectResponse(url)
+
     def error_400(self, message: str = 'bad request provided'):
         raise HTTPException(
             status.HTTP_400_BAD_REQUEST,
@@ -49,24 +68,11 @@ class ResponseService(Service):
             self.__create_error_detail(message)
         )
 
-    def redirect_304(self, url: str):
-        url = URL(url)
-        return RedirectResponse(url)
-
-    def success_200(self, content='successfully done'):
-        return JSONResponse(
-            self.__create_success_detail(content),
-            status.HTTP_200_OK
+    def error_500(self, message: str = 'Something went wrong!'):
+        raise HTTPException(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+            self.__create_error_detail(message)
         )
-
-    def success_201(self, content: Any = 'successfully created'):
-        return JSONResponse(
-            self.__create_success_detail(content),
-            status.HTTP_201_CREATED
-        )
-
-    def success_204(self):
-        return JSONResponse(self.__create_success_detail(), status.HTTP_204_NO_CONTENT)
 
 
 responseService = ResponseService()
