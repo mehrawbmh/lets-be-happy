@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 
 from pydantic import Field
 
@@ -12,10 +12,10 @@ class Task(Entity):
     def get_collection_name():
         return 'tasks'
 
-    created_by: str  # user id
-    assigned_to: str  # user id
-    deadline: date
-    finished_at: datetime | None
+    created_by: str  # username # TODO: is it better idea to change it to user id?!
+    assignee: str  # username
+    deadline: datetime
+    finished_at: datetime | None = None
     status: TaskStatus = TaskStatus.BACKLOG
     priority: TaskPriority
     description: str = Field(default='')
