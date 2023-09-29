@@ -4,10 +4,10 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo import ASCENDING
 
 from app.configs.settings import settings
+from app.core.services.service import Service
 
 
-# TODO: make it singleton
-class MongoClient:
+class MongoClient(Service):
     """
     Mongo DB client and connection
     """
@@ -36,7 +36,7 @@ class MongoClient:
         )
 
     async def get_main_db(self) -> AsyncIOMotorDatabase:
-        if not self.__db:
+        if self.__db is None:
             self.__client = await self.get_client() if not self.__client else self.__client
 
             dblist = await self.__client.list_database_names()
