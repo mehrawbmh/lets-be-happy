@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Self
+from typing import Self, NoReturn
 
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -25,6 +25,10 @@ class Entity(BaseModel, ABC):
     @abstractmethod
     def get_collection_name():
         raise NotImplementedError('You must implement this method!!')
+
+    @classmethod
+    async def create_indexes(cls) -> NoReturn:
+        return
 
     @staticmethod
     async def get_db() -> AsyncIOMotorDatabase:

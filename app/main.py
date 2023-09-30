@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.configs.settings import settings
-from app.core.database.mongo import MongoClient
+from app.core.database.indexes import DatabaseIndexManager
 from app.core.enum.event_types import EventTypes
 from app.dependencies.database import get_main_db
 from app.endpoints.tasks import router as tasks_router
@@ -38,8 +38,9 @@ app = FastAPI(
     version="1.0.0",
     redoc_url="/docs2",
 )
+
 app.include_router(router)
-app.add_event_handler(EventTypes.STARTUP, MongoClient().crete_indexes)
+app.add_event_handler(EventTypes.STARTUP, DatabaseIndexManager.crete_indexes)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
