@@ -10,7 +10,7 @@ from app.models.schema import Schema
 
 class CreateTask(Schema):
     title: str
-    assignee_username: str
+    assignee: str
     deadline: datetime = TimeService.get_today_end()
     status: Literal[TaskStatus.BACKLOG, TaskStatus.IN_PROGRESS] = TaskStatus.BACKLOG
     priority: TaskPriority = TaskPriority.MEDIUM

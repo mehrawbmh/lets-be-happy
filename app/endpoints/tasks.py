@@ -14,9 +14,9 @@ router = APIRouter(prefix='/tasks', tags=[Tags.TASK])
 
 @router.post('/')
 async def create_task(task_input: CreateTask, user: TokenData = Depends(get_staff_user)):
-    assignee = await User.find_by_username(task_input.assignee_username)
+    assignee = await User.find_by_username(task_input.assignee)
     if not assignee:
-        return responseService.error_404(f"user with this username: {task_input.assignee_username} not found.")
+        return responseService.error_404(f"user with this username: {task_input.assignee} not found.")
 
     if user.role != Role.ADMIN and assignee.id != user.id:
         raise HTTPException(

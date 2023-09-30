@@ -13,7 +13,7 @@ from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_signup import UserSignUp
 
-router = APIRouter(prefix='/users', tags=[Tags.USER, Tags.AUTH])
+router = APIRouter(prefix='/users', tags=[Tags.USER])
 
 
 @router.post("/signup")
