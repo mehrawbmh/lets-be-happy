@@ -1,7 +1,9 @@
 import re
+from typing import NoReturn
 
 from fastapi import HTTPException
 from pydantic import Field, field_validator
+from pymongo import ASCENDING
 from starlette import status
 
 from app.core.enum.roles import Role
@@ -19,6 +21,30 @@ class User(Entity):
     @staticmethod
     def get_collection_name():
         return 'users'
+
+    @classmethod
+    async def create_indexes(cls) -> NoReturn:
+        collection = await cls.get_collection()
+        await collection.create_index(
+            [("username", ASCENDING)],
+            name="username",
+            unique=True,
+            background=True,
+        )
+
+        await collection.create_index(
+            [("email", ASCENDING)],
+            name="email",
+            unique=True,
+            background=True,
+        )
+
+        await collection.create_index(
+            [("phone", ASCENDING)],
+            name="phone",
+            unique=True,
+            background=True,
+        )
 
     @classmethod
     async def find_by_username(cls, username: str):
