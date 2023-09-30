@@ -54,8 +54,6 @@ class MongoClient(Service):
         Create proper indexes for each entity if not exist #TODO: move each logic per entity
         """
         db = await self.get_main_db()
-        print('here on startup!')
-        return
 
         await db.users.create_index(
             [("username", ASCENDING)],
@@ -74,6 +72,7 @@ class MongoClient(Service):
         await db.tasks.create_index(
             [("assignee", ASCENDING)],
             name="assignee",
-            unique=True,
             background=True
         )
+
+        print("indexes were created successfully")
