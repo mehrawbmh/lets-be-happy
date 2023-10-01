@@ -1,8 +1,10 @@
+from bson import ObjectId
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from pymongo.errors import DuplicateKeyError
 
 from app.core.auth.jwt_authentication import JWTAuthentication
+from app.core.enum.roles import Role
 from app.core.enum.tags import Tags
 from app.core.services.response_service import responseService
 from app.dependencies.database import get_main_db
@@ -11,6 +13,7 @@ from app.models.entities.users import User
 from app.models.schemas.auth.token_data import TokenData
 from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
+from app.models.schemas.user.user_promotion import UserPromoteSchema
 from app.models.schemas.user.user_signup import UserSignUp
 
 router = APIRouter(prefix='/users', tags=[Tags.USER])
@@ -54,3 +57,18 @@ async def list_users(user: TokenData = Depends(get_admin_user), db: AsyncIOMotor
         final.append(user.model_dump(exclude={'password'}))
 
     return final
+
+
+@router.patch('/promote')
+async def promote_user_role(promote_schema: UserPromoteSchema, admin_user: TokenData = Depends(get_admin_user)):
+    collection = await User.get_collection()
+    current_user = await User.find_by_username(promote_schema.username)
+    if not current_user:
+        return responseService.error_404('username not found')
+
+    if current_user.role == Role.ADMIN:
+        return responseService.error_403('you can not change an admin role!')
+
+    update_result = await collection.update_one({"_id": ObjectId(current_user.id)},
+                                                {"$set": {"role": promote_schema.new_role}})
+    return responseService.operation_response(update_result.acknowledged)
