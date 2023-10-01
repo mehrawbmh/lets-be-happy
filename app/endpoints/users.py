@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.errors import DuplicateKeyError
 
 from app.core.auth.jwt_authentication import JWTAuthentication
-from app.core.enum.roles import Role
 from app.core.enum.tags import Tags
 from app.core.services.response_service import responseService
 from app.dependencies.database import get_main_db
@@ -19,15 +19,16 @@ router = APIRouter(prefix='/users', tags=[Tags.USER])
 @router.post("/signup")
 async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_main_db)):
     # TODO: move it to handler or sth, validate basic password rules, add response model, check email, etc
-    existing = await db.users.find_one({"username": user_info.username})
-    # TODO: also check duplicate phone (or email?) with unique mongo index error?
-    if existing:
-        return responseService.error_400("This username exists! Try other usernames")
-
+    User.check_raw_password(user_info.password)
     user_info.password = JWTAuthentication.hash_password(user_info.password)
     user = User.model_validate({**user_info.model_dump(), 'id': None})
 
-    result = await user.insert()
+    try:
+        result = await user.insert()
+    except DuplicateKeyError as dke:
+        duplicated_fields: dict = dke.details['keyPattern']
+        duplicated_field = list(duplicated_fields.keys())[0]
+        raise responseService.error_400(f"this {duplicated_field} already exists! try another one")
     if not result.acknowledged:
         return responseService.error_500()
     return responseService.success_201({"success": True, "id": str(result.inserted_id)})
@@ -53,8 +54,3 @@ async def list_users(user: TokenData = Depends(get_admin_user), db: AsyncIOMotor
         final.append(user.model_dump(exclude={'password'}))
 
     return final
-
-
-@router.patch('/promote')
-async def promote_user_role(role: Role, admin_user: TokenData = Depends(get_admin_user)):
-    ...
