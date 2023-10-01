@@ -80,5 +80,9 @@ class ResponseService(Service):
             self.__create_error_detail('this feature is not implemented yet. try later =)')
         )
 
+    def operation_response(self, operation_status: bool, success_message: str = "operation is done successfully",
+                           error_message: str = "Something went wrong"):
+        return self.success_200(success_message) if operation_status else self.error_500(error_message)
+
 
 responseService = ResponseService()
