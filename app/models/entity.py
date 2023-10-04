@@ -19,7 +19,7 @@ class Entity(BaseModel, ABC):
     """
     id: str | None = None  # equivalent of _id in DB
     active: bool = True
-    created_at: str = Field(default=str(TimeService.get_now()))
+    created_at: str = Field(default_factory=TimeService.get_now)
 
     @staticmethod
     @abstractmethod
