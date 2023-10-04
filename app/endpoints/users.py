@@ -10,7 +10,7 @@ from app.core.services.response_service import responseService
 from app.dependencies.database import get_main_db
 from app.dependencies.user import get_current_user, get_admin_user, get_super_admin_user
 from app.models.entities.users import User
-from app.models.schemas.auth.token_data import TokenData
+from app.models.schemas.auth.token_data import UserTokenData
 from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_promotion import UserPromoteSchema
@@ -44,13 +44,13 @@ async def login(user: UserLogin):
 
 
 @router.get('/me')
-async def profile(user: TokenData = Depends(get_current_user)):
+async def profile(user: UserTokenData = Depends(get_current_user)):
     user = await User.find_by_id(user.id)
     return UserProfile.model_validate(user.model_dump())
 
 
 @router.get('/list')
-async def list_users(user: TokenData = Depends(get_admin_user), db: AsyncIOMotorDatabase = Depends(get_main_db)):
+async def list_users(user: UserTokenData = Depends(get_admin_user), db: AsyncIOMotorDatabase = Depends(get_main_db)):
     users = db.users.find({})
     final = []
     for user in await users.to_list(length=100):
@@ -61,7 +61,8 @@ async def list_users(user: TokenData = Depends(get_admin_user), db: AsyncIOMotor
 
 
 @router.patch('/change-role')
-async def change_user_role(promote_schema: UserPromoteSchema, admin_user: TokenData = Depends(get_super_admin_user)):
+async def change_user_role(promote_schema: UserPromoteSchema,
+                           admin_user: UserTokenData = Depends(get_super_admin_user)):
     collection = await User.get_collection()
     current_user = await User.find_by_username(promote_schema.username)
     if not current_user:
@@ -76,7 +77,7 @@ async def change_user_role(promote_schema: UserPromoteSchema, admin_user: TokenD
 
 
 @router.put("")
-async def update_user_info(update_schema: UserUpdateSchema, user: TokenData = Depends(get_current_user)):
+async def update_user_info(update_schema: UserUpdateSchema, user: UserTokenData = Depends(get_current_user)):
     users_collection = await User.get_collection()
     try:
         update_result = await users_collection.update_one({'_id': ObjectId(user.id)},
@@ -90,7 +91,8 @@ async def update_user_info(update_schema: UserUpdateSchema, user: TokenData = De
 
 
 @router.delete("/{user_id}")
-async def delete_user(user_id: str, just_deactivate: bool = False, user_token: TokenData = Depends(get_current_user)):
+async def delete_user(user_id: str, just_deactivate: bool = False,
+                      user_token: UserTokenData = Depends(get_current_user)):
     user = await User.find_by_id(user_id, False)
     if user_token.role != Role.SUPER_ADMIN and user_token.id != user_id:
         return responseService.error_403("you can not delete other users!")

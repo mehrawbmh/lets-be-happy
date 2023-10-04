@@ -9,7 +9,7 @@ from passlib.context import CryptContext
 from app.configs.settings import settings
 from app.models.entities.users import User
 from app.models.schemas.auth.login_response import LoginResponse
-from app.models.schemas.auth.token_data import TokenData
+from app.models.schemas.auth.token_data import UserTokenData
 
 
 class JWTAuthentication:
@@ -39,7 +39,7 @@ class JWTAuthentication:
         except JWTError:
             raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "Wrong login token given"})
 
-        user_data = TokenData.model_validate(user_data)
+        user_data = UserTokenData.model_validate(user_data)
         return user_data
 
     @classmethod
@@ -52,7 +52,7 @@ class JWTAuthentication:
     @staticmethod
     def encode(user: User, expiration_seconds: int = settings.ACCESS_TOKEN_EXPIRATION_SECONDS) -> str:
         expiration = datetime.utcnow() + timedelta(seconds=expiration_seconds)
-        user_data = TokenData.model_validate({**user.model_dump(), 'exp': expiration})
+        user_data = UserTokenData.model_validate({**user.model_dump(), 'exp': expiration})
 
         return jwt.encode(user_data.model_dump(), settings.SECRET_KEY, settings.AUTHORIZATION_HASH_ALGORITHM)
 

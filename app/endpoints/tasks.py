@@ -7,14 +7,14 @@ from app.core.services.response_service import responseService
 from app.dependencies.user import get_staff_user, get_admin_user
 from app.models.entities.tasks import Task
 from app.models.entities.users import User
-from app.models.schemas.auth.token_data import TokenData
+from app.models.schemas.auth.token_data import UserTokenData
 from app.models.schemas.task.task_create import CreateTask
 
 router = APIRouter(prefix='/tasks', tags=[Tags.TASK])
 
 
 @router.post('/')
-async def create_task(task_input: CreateTask, user: TokenData = Depends(get_staff_user)):
+async def create_task(task_input: CreateTask, user: UserTokenData = Depends(get_staff_user)):
     assignee = await User.find_by_username(task_input.assignee)
     if not assignee:
         return responseService.error_404(f"user with this username: {task_input.assignee} not found.")
@@ -46,7 +46,7 @@ async def create_task(task_input: CreateTask, user: TokenData = Depends(get_staf
 
 
 @router.get('/')
-async def get_tasks(assigned: bool = True, created_by: bool = True, user: TokenData = Depends(get_staff_user)):
+async def get_tasks(assigned: bool = True, created_by: bool = True, user: UserTokenData = Depends(get_staff_user)):
     if not (assigned or created_by):
         return responseService.error_400('you have to choose at list one filter')
 
@@ -62,13 +62,13 @@ async def get_tasks(assigned: bool = True, created_by: bool = True, user: TokenD
 
 
 @router.get('/all')
-async def get_all_tasks(user: TokenData = Depends(get_admin_user)):
+async def get_all_tasks(user: UserTokenData = Depends(get_admin_user)):
     # TODO: add pagination and filter
     return await Task.list_find_many({}, 100)
 
 
 @router.get('/{task_id}')
-async def get_task_detail(task_id: str, user: TokenData = Depends(get_staff_user)):
+async def get_task_detail(task_id: str, user: UserTokenData = Depends(get_staff_user)):
     task = await Task.find_by_id(task_id, False)
     if user.role == Role.ADMIN or task.assignee == user.username or task.created_by == user.username:
         return task.model_dump()
@@ -77,17 +77,17 @@ async def get_task_detail(task_id: str, user: TokenData = Depends(get_staff_user
 
 
 @router.put('/{task_id}')
-async def update_task_detail(task_id: str, user: TokenData = Depends(get_staff_user)):
+async def update_task_detail(task_id: str, user: UserTokenData = Depends(get_staff_user)):
     return responseService.error_501()
 
 
 @router.patch('/{task_id}')
-async def mark_task_done(task_id: str, user: TokenData = Depends(get_staff_user)):
+async def mark_task_done(task_id: str, user: UserTokenData = Depends(get_staff_user)):
     return responseService.error_501()
 
 
 @router.delete('/{task_id}')
-async def delete_task(task_id: str, just_deactivate: bool = False, user: TokenData = Depends(get_staff_user)):
+async def delete_task(task_id: str, just_deactivate: bool = False, user: UserTokenData = Depends(get_staff_user)):
     task = await Task.find_by_id(task_id, False)
     if just_deactivate and not task.active:
         return responseService.error_400('this task is already inactive!')
