@@ -87,3 +87,15 @@ async def update_user_info(update_schema: UserUpdateSchema, user: TokenData = De
         raise responseService.error_400(f"this {duplicated_field} already exists! try another one")
 
     return responseService.operation_response(update_result.acknowledged and update_result.modified_count == 1)
+
+
+@router.delete("/{user_id}")
+async def delete_user(user_id: str, just_deactivate: bool = False, user_token: TokenData = Depends(get_current_user)):
+    user = await User.find_by_id(user_id, False)
+    if user_token.role != Role.SUPER_ADMIN and user_token.id != user_id:
+        return responseService.error_403("you can not delete other users!")
+
+    if just_deactivate and not user.active:
+        return responseService.error_400('this user is already inactive!')
+
+    return responseService.success_204() if await user.delete(just_deactivate) else responseService.error_500()
