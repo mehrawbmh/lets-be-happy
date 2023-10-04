@@ -32,3 +32,7 @@ async def get_admin_user(user: TokenData = Depends(get_current_user)):
 async def get_staff_user(user: TokenData = Depends(get_current_user)):
     PermissionManager(user).permit(AccessLevel.STAFF)
     return user
+
+
+async def get_super_admin_user(user: TokenData = Depends(get_current_user)):
+    PermissionManager(user).permit(AccessLevel.SUPER_ADMIN)
