@@ -23,9 +23,8 @@ class JWTAuthentication:
         user = await User.find_by_username(username)
 
         if user and self.check_password(password, user.password):
-            user_data = TokenData.model_validate(user.model_dump())
-            bearer_token = self.encode(user_data)
-            return LoginResponse(access_token=bearer_token, token_type="Bearer", role=user_data.role)
+            bearer_token = self.encode(user)
+            return LoginResponse(access_token=bearer_token, token_type="Bearer", role=user.role)
 
         raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "invalid username or password"})
 
@@ -51,10 +50,11 @@ class JWTAuthentication:
         return self.password_context.verify(plain, hashed)
 
     @staticmethod
-    def encode(data: TokenData, expiration_seconds: int = settings.ACCESS_TOKEN_EXPIRATION_SECONDS) -> str:
-        to_encode_data = data.model_dump()
-        to_encode_data["exp"] = datetime.utcnow() + timedelta(seconds=expiration_seconds)
-        return jwt.encode(to_encode_data, settings.SECRET_KEY, settings.AUTHORIZATION_HASH_ALGORITHM)
+    def encode(user: User, expiration_seconds: int = settings.ACCESS_TOKEN_EXPIRATION_SECONDS) -> str:
+        expiration = datetime.utcnow() + timedelta(seconds=expiration_seconds)
+        user_data = TokenData.model_validate({**user.model_dump(), 'exp': expiration})
+
+        return jwt.encode(user_data.model_dump(), settings.SECRET_KEY, settings.AUTHORIZATION_HASH_ALGORITHM)
 
     def decode(self) -> dict:
         return jwt.decode(self.token, settings.SECRET_KEY, settings.AUTHORIZATION_HASH_ALGORITHM)
