@@ -15,6 +15,7 @@ from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_promotion import UserPromoteSchema
 from app.models.schemas.user.user_signup import UserSignUp
+from app.models.schemas.user.user_update import UserUpdateSchema
 
 router = APIRouter(prefix='/users', tags=[Tags.USER])
 
@@ -72,3 +73,17 @@ async def change_user_role(promote_schema: UserPromoteSchema, admin_user: TokenD
     update_result = await collection.update_one({"_id": ObjectId(current_user.id)},
                                                 {"$set": {"role": promote_schema.new_role}})
     return responseService.operation_response(update_result.acknowledged)
+
+
+@router.put("")
+async def update_user_info(update_schema: UserUpdateSchema, user: TokenData = Depends(get_current_user)):
+    users_collection = await User.get_collection()
+    try:
+        update_result = await users_collection.update_one({'_id': ObjectId(user.id)},
+                                                          {'$set': update_schema.model_dump()})
+    except DuplicateKeyError as dke:
+        duplicated_fields: dict = dke.details['keyPattern']
+        duplicated_field = list(duplicated_fields.keys())[0]
+        raise responseService.error_400(f"this {duplicated_field} already exists! try another one")
+
+    return responseService.operation_response(update_result.acknowledged and update_result.modified_count == 1)
