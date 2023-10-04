@@ -8,7 +8,7 @@ from passlib.context import CryptContext
 
 from app.configs.settings import settings
 from app.models.entities.users import User
-from app.models.schemas.auth.token import Token
+from app.models.schemas.auth.login_response import LoginResponse
 from app.models.schemas.auth.token_data import TokenData
 
 
@@ -19,13 +19,13 @@ class JWTAuthentication:
     def __init__(self, token: str | None = None):
         self.token = token
 
-    async def login_with_password(self, username: str, password: str) -> Token:
+    async def login_with_password(self, username: str, password: str) -> LoginResponse:
         user = await User.find_by_username(username)
 
         if user and self.check_password(password, user.password):
             user_data = TokenData.model_validate(user.model_dump())
             bearer_token = self.encode(user_data)
-            return Token(access_token=bearer_token, token_type="Bearer")
+            return LoginResponse(access_token=bearer_token, token_type="Bearer", role=user_data.role)
 
         raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "invalid username or password"})
 

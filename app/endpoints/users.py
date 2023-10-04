@@ -24,7 +24,7 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_
     # TODO: move it to handler or sth, validate basic password rules, add response model, check email, etc
     User.check_raw_password(user_info.password)
     user_info.password = JWTAuthentication.hash_password(user_info.password)
-    user = User.model_validate({**user_info.model_dump(), 'id': None})
+    user = User.model_validate(user_info.model_dump())
 
     try:
         result = await user.insert()
