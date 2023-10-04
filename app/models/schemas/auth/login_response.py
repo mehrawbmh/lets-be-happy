@@ -5,6 +5,7 @@ from app.models.schema import Schema
 
 
 class LoginResponse(Schema):
+    id: str
     access_token: str
     token_type: str
     success: bool = Field(default=True)

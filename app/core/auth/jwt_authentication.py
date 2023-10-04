@@ -24,7 +24,7 @@ class JWTAuthentication:
 
         if user and self.check_password(password, user.password):
             bearer_token = self.encode(user)
-            return LoginResponse(access_token=bearer_token, token_type="Bearer", role=user.role)
+            return LoginResponse(access_token=bearer_token, token_type="Bearer", role=user.role, id=user.id)
 
         raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "invalid username or password"})
 
