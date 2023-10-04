@@ -7,4 +7,6 @@ class Schema(Model):
         You have to specify use case when you want to add schema. e.g: there's just one user entity, but it can contain
         multiple user schemas on different purposes: UserLogin, UserSignUp, etc.
     """
-    pass
+
+    class Config:
+        pass

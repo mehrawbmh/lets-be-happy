@@ -1,5 +1,6 @@
 from fastapi import Depends, APIRouter, HTTPException, status
 
+from app.core.enum.access_levels import AccessLevel
 from app.core.enum.roles import Role
 from app.core.enum.tags import Tags
 from app.core.services.response_service import responseService
@@ -18,7 +19,7 @@ async def create_task(task_input: CreateTask, user: TokenData = Depends(get_staf
     if not assignee:
         return responseService.error_404(f"user with this username: {task_input.assignee} not found.")
 
-    if user.role != Role.ADMIN and assignee.id != user.id:
+    if (user.role not in AccessLevel.ADMIN.value) and assignee.id != user.id:
         raise HTTPException(
             status.HTTP_403_FORBIDDEN,
             {'message': 'you can not create task for other staff!'}
