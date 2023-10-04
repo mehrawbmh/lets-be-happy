@@ -1,25 +1,27 @@
 from abc import ABC, abstractmethod
+from datetime import datetime
 from typing import Self, NoReturn
 
 from bson import ObjectId
 from bson.errors import InvalidId
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
-from pydantic import BaseModel, Field
+from pydantic import Field
 from pymongo.results import InsertOneResult, DeleteResult, UpdateResult
 
 from app.core.services.response_service import responseService
 from app.core.services.time_service import TimeService
 from app.dependencies.database import get_main_db
+from app.models.model import Model
 
 
-class Entity(BaseModel, ABC):
+class Entity(Model, ABC):
     """
         This is for models which are DB documents (same as SQL tables) -  all entities of our application
         todo: add repository architecture + getter setters
     """
     id: str | None = None  # equivalent of _id in DB
     active: bool = True
-    created_at: str = Field(default_factory=TimeService.get_now)
+    created_at: datetime = Field(default_factory=TimeService.get_now)
 
     @staticmethod
     @abstractmethod
@@ -64,6 +66,13 @@ class Entity(BaseModel, ABC):
         collection = await cls.get_collection()
         documents = await collection.find(condition).to_list(max_length)
         return list(map(lambda doc: cls._convert_document_to_object(doc), documents))
+
+    def log_properties(self) -> str:
+        log_message = f"{self.__class__.__name__} Entity:\n"
+        for field, field_value in self:
+            print(f"{field}: {field_value}")
+
+        return log_message
 
     async def insert(self, exclude: set | None = None) -> InsertOneResult:
         """ Simple insert the instance with ability to exclude some field """
