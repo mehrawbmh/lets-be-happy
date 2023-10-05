@@ -87,7 +87,11 @@ async def update_user_info(update_schema: UserUpdateSchema, user: UserTokenData 
         duplicated_field = list(duplicated_fields.keys())[0]
         raise responseService.error_400(f"this {duplicated_field} already exists! try another one")
 
-    return responseService.operation_response(update_result.acknowledged and update_result.modified_count == 1)
+    if not update_result.acknowledged:
+        return responseService.error_500()
+
+    return responseService.success_200() if update_result.modified_count else responseService.error_400(
+        'nothing to update!')
 
 
 @router.delete("/{user_id}")
