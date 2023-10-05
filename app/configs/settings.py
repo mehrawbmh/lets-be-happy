@@ -21,8 +21,7 @@ class Settings(BaseSettings):
     MONGO_HOST = "localhost"
 
     BASE_DIR = str(Path(__file__).resolve().parent.parent)
-    PROJECT_NAME = str("lets-be-happy")
-
+    PROJECT_NAME: str = 'Panel'
     SECRET_KEY = str()
     AUTHORIZATION_HASH_ALGORITHM = str()
     ACCESS_TOKEN_EXPIRATION_SECONDS = 48 * 60 * 60

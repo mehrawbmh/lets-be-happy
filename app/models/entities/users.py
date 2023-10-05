@@ -12,7 +12,7 @@ from app.models.entity import Entity
 class User(Entity):
     # id: str | None
     username: str
-    password: str
+    password: str = Field(repr=False)
     phone: str = Field()
     role: str = Role.USER
     email: str | None = Field(default=None)
@@ -88,12 +88,12 @@ class User(Entity):
                 "invalid password given." +
                 "password must be at least 8 characters and " +
                 "contain at least one lower and one upper case letter, one digit and one special character " +
-                "( - @ _ # )"
+                "( - @ _ # . ! # % ^ & *)"
             )
 
     @staticmethod
     def is_password_valid(password: str) -> bool:
-        special_chars = ['@', '$', '_', '-']
+        special_chars = ['@', '$', '_', '-', '.', '!', '#', '%', '^', '&', '*']
         lower_count, upper_count, special_char_count, digit_count = 0, 0, 0, 0
 
         if len(password) >= 8:
