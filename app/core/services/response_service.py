@@ -40,9 +40,9 @@ class ResponseService(Service):
     def success_204(self):
         return Response(None, status.HTTP_204_NO_CONTENT)
 
-    def redirect_304(self, url: str):
+    def redirect(self, url: str, status_code: int = 307):
         url = URL(url)
-        return RedirectResponse(url)
+        return RedirectResponse(url, status_code=status_code)
 
     def error_400(self, message: str = 'bad request provided'):
         raise HTTPException(
