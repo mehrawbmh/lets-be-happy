@@ -11,6 +11,7 @@ from app.dependencies.database import get_main_db
 from app.dependencies.user import get_current_user, get_admin_user, get_super_admin_user
 from app.models.entities.users import User
 from app.models.schemas.auth.token_data import UserTokenData
+from app.models.schemas.user.change_password import ChangePassword
 from app.models.schemas.user.user_login import UserLogin
 from app.models.schemas.user.user_profile import UserProfile
 from app.models.schemas.user.user_promotion import UserPromoteSchema
@@ -21,7 +22,7 @@ router = APIRouter(prefix='/users', tags=[Tags.USER])
 
 
 @router.post("/signup")
-async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_main_db)):
+async def sign_up(user_info: UserSignUp):
     # TODO: move it to handler or sth, validate basic password rules, add response model, check email, etc
     User.check_raw_password(user_info.password)
     user_info.password = JWTAuthentication.hash_password(user_info.password)
@@ -41,6 +42,28 @@ async def sign_up(user_info: UserSignUp, db: AsyncIOMotorDatabase = Depends(get_
 @router.post("/login")
 async def login(user: UserLogin):
     return await JWTAuthentication().login_with_password(user.username, user.password)
+
+
+@router.patch('/change-password')
+async def change_password(change_password_schema: ChangePassword,
+                          user_token: UserTokenData = Depends(get_current_user)):
+    User.check_raw_password(change_password_schema.new_password)
+    user = await User.find_by_id(user_token.id, False)
+
+    if not JWTAuthentication().check_password(change_password_schema.old_password, user.password):
+        return responseService.error_403('current password is not correct')
+
+    hashed = JWTAuthentication.hash_password(change_password_schema.new_password)
+    # user.password = hashed
+    # await user.update() todo: make it
+    user_collection = await User.get_collection()
+    result = await user_collection.update_one(
+        {'_id': ObjectId(user.id)},
+        {'$set': {'password': hashed}}
+    )
+
+    return responseService.success_200(
+        'successfully changed password') if result.modified_count else responseService.error_500()
 
 
 @router.get('/me')
