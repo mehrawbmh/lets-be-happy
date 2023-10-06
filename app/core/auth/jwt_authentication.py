@@ -1,12 +1,11 @@
 from datetime import datetime, timedelta
 
-from fastapi import status
-from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError, ExpiredSignatureError
 from passlib.context import CryptContext
 
 from app.configs.settings import settings
+from app.core.services.response_service import responseService
 from app.models.entities.users import User
 from app.models.schemas.auth.login_response import LoginResponse
 from app.models.schemas.auth.token_data import UserTokenData
@@ -26,18 +25,17 @@ class JWTAuthentication:
             bearer_token = self.encode(user)
             return LoginResponse(access_token=bearer_token, token_type="Bearer", role=user.role, id=user.id)
 
-        raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "invalid username or password"})
+        return responseService.error_403("Invalid username or password")
 
     def get_user(self):
         if not self.token:
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED, {"message": "You have to log in first!"})
+            return responseService.error_401("You have to log in first!")
         try:
             user_data = self.decode()
         except ExpiredSignatureError:
-            # TODO: redirect
-            raise HTTPException(status.HTTP_401_UNAUTHORIZED, {"message": "You have to log in first!"})
+            return responseService.error_401('Token has expired')
         except JWTError:
-            raise HTTPException(status.HTTP_403_FORBIDDEN, {"message": "Wrong login token given"})
+            return responseService.error_403("Wrong login token given")
 
         user_data = UserTokenData.model_validate(user_data)
         return user_data
