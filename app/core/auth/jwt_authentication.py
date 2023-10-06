@@ -49,6 +49,7 @@ class JWTAuthentication:
 
     @staticmethod
     def encode(user: User, expiration_seconds: int = settings.ACCESS_TOKEN_EXPIRATION_SECONDS) -> str:
+        # TODO: refactor and decouple jwt from password
         expiration = datetime.utcnow() + timedelta(seconds=expiration_seconds)
         user_data = UserTokenData.model_validate({**user.model_dump(), 'exp': expiration})
 

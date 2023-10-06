@@ -50,10 +50,10 @@ class ResponseService(Service):
             self.__create_error_detail(message)
         )
 
-    def error_401(self):
+    def error_401(self, message: str = 'you have to login first!'):
         raise HTTPException(
             status.HTTP_401_UNAUTHORIZED,
-            self.__create_error_detail('you have to login first!')
+            self.__create_error_detail(message)
         )
 
     def error_403(self, message: str = "you are not permitted for this action"):

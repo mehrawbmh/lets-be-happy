@@ -79,10 +79,11 @@ class User(Entity):
         if phone.startswith('09') and len(phone) == 11:
             return phone
 
-        return responseService.error_400('bad phone nubmer given')
+        return responseService.error_400('bad phone number given')
 
     @classmethod
     def check_raw_password(cls, password: str):
+        # TODO: move it to password manager
         if not cls.is_password_valid(password):
             return responseService.error_400(
                 "invalid password given." +
