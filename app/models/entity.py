@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Self, NoReturn
@@ -6,6 +7,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from motor.motor_asyncio import AsyncIOMotorCollection, AsyncIOMotorDatabase
 from pydantic import Field
+from pymongo.errors import DuplicateKeyError 
 from pymongo.results import InsertOneResult, DeleteResult, UpdateResult
 
 from app.core.services.response_service import responseService
@@ -80,7 +82,26 @@ class Entity(Model, ABC):
         exclude.add('id')
 
         collection = await self.get_collection()
-        return await collection.insert_one(self.model_dump(exclude=exclude))
+
+        try:
+            return await collection.insert_one(self.model_dump(exclude=exclude))
+        except DuplicateKeyError as dke:
+            duplicated_fields: dict = dke.details['keyPattern']
+            duplicated_field = list(duplicated_fields.keys())[0]
+            raise responseService.error_400(f"this {duplicated_field} already exists! try another one")
+    
+    async def update(self, exclude: set = {}, exclude_none: bool = False) -> UpdateResult:
+        """ updates the db to the current state of class """
+        current_dict = self.model_dump(exclude=exclude, exclude_unset=True, exclude_none=exclude_none)
+        
+        collection = await self.get_collection()
+        try:
+            return await collection.update_one({'_id': self.id}, {'$set':current_dict})
+        except DuplicateKeyError as dke:
+            duplicated_fields: dict = dke.details['keyPattern']
+            duplicated_field = list(duplicated_fields.keys())[0]
+            raise responseService.error_400(f"this {duplicated_field} already exists! try another one")
+    
 
     async def delete(self, soft: bool = False) -> bool:
         """ Soft delete for now means deactivating the entity! just to make active = false in db """
