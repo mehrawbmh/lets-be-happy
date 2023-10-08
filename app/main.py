@@ -1,3 +1,4 @@
+import time
 from fastapi import FastAPI, Depends, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -41,6 +42,7 @@ app = FastAPI(
 
 app.include_router(router)
 app.add_event_handler(EventTypes.STARTUP, DatabaseIndexManager.crete_indexes)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=['*'],
@@ -48,3 +50,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware('http')
+async def process_time_response(request, call_next):
+    start = time.time()
+    response = await call_next(request)
+    end = time.time()
+    response.headers['X-processd-ms'] = 1000 * (end - start)  # in milli seconds
+    return response
