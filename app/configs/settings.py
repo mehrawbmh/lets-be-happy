@@ -1,10 +1,11 @@
-# TODO: make it singleton
 from pathlib import Path
 
 from pydantic.v1 import BaseSettings
 
+from app.core.services.service import Service
 
-class Settings(BaseSettings):
+
+class Settings(Service, BaseSettings):
     class Config:
         """
         Config .env file for project credential and environment stuff
@@ -19,6 +20,9 @@ class Settings(BaseSettings):
     MONGO_DB = "main"
     MONGO_PORT = "27017"
     MONGO_HOST = "localhost"
+
+    DOC_USERNAME=''
+    DOC_PASSWORD=''
 
     BASE_DIR = str(Path(__file__).resolve().parent.parent)
     PROJECT_NAME: str = 'Panel'
