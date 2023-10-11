@@ -23,6 +23,7 @@ class Settings(Service, BaseSettings):
 
     DOC_USERNAME=''
     DOC_PASSWORD=''
+    OPENAPI_URL=''
 
     BASE_DIR = str(Path(__file__).resolve().parent.parent)
     PROJECT_NAME: str = 'Panel'
