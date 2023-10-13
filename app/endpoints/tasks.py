@@ -19,11 +19,11 @@ async def create_task(task_input: CreateTask, user: UserTokenData = Depends(get_
     if not assignee:
         return responseService.error_404(f"user with this username: {task_input.assignee} not found.")
 
-    if (user.role not in AccessLevel.ADMIN.value) and assignee.id != user.id:
-        raise HTTPException(
-            status.HTTP_403_FORBIDDEN,
-            {'message': 'you can not create task for other staff!'}
-        )
+    # if (user.role not in AccessLevel.ADMIN.value) and assignee.id != user.id:
+    #     raise HTTPException(
+    #         status.HTTP_403_FORBIDDEN,
+    #         {'message': 'you can not create task for other staff!'}
+    #     )
 
     task = Task.model_validate(
         {
