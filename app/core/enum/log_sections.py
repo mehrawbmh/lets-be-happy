@@ -1,6 +1,6 @@
 from enum import Enum
 
 
-class Logger(str, Enum):
+class LogSection(str, Enum):
     DEFAULT = 'default logger'
     STARTUP = 'start up events'

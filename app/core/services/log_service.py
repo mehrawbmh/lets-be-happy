@@ -2,12 +2,12 @@ import logging
 
 from app.configs.settings import settings
 from app.core.enum.env_modes import EnvMode
-from app.core.enum.logger import Logger
+from app.core.enum.log_sections import LogSection
 from app.core.services.service import Service
 
 
 class LogService(Service):
-    logger_name: Logger = Logger.DEFAULT
+    logger_name: LogSection = LogSection.DEFAULT
     log_string_format = "** %(levelname)s: ** %(message)s  ---  at %(asctime)s on %(name)s"
 
     class CustomFormatter(logging.Formatter):
@@ -66,7 +66,7 @@ class LogService(Service):
         self.__logger = logger
 
     @property
-    def logger(self):
+    def logger(self) -> logging.Logger:
         return self.__logger
 
     def get_logger(self, name: str | None = None) -> logging.Logger:
