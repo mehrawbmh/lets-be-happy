@@ -1,9 +1,11 @@
-import time, secrets
+import secrets
+import time
 from typing import Annotated
+
 from fastapi import FastAPI, Depends, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from fastapi.openapi.docs import get_redoc_html, get_swagger_ui_html
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -56,6 +58,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.middleware('http')
 async def process_time_response(request, call_next):
     start = time.time()
@@ -67,21 +70,23 @@ async def process_time_response(request, call_next):
 
 @app.get("/docs", include_in_schema=False)
 async def get_swagger_api_docs(credentials: Annotated[HTTPBasicCredentials, Depends(HTTPBasic())]):
-    if secrets.compare_digest(credentials.username, settings.DOC_USERNAME) and secrets.compare_digest(credentials.password, settings.DOC_PASSWORD):
+    if secrets.compare_digest(credentials.username, settings.DOC_USERNAME) \
+            and secrets.compare_digest(credentials.password, settings.DOC_PASSWORD):
         return get_swagger_ui_html(
             openapi_url=app.openapi_url,
             title=app.title + " - Swagger UI",
         )
-    
+
     return responseService.error_403('wrong username or password given')
 
 
 @app.get("/redoc", include_in_schema=False)
 async def get_redoc_api_docs(credentials: Annotated[HTTPBasicCredentials, Depends(HTTPBasic())]):
-    if secrets.compare_digest(credentials.username, settings.DOC_USERNAME) and secrets.compare_digest(credentials.password, settings.DOC_PASSWORD):
+    if secrets.compare_digest(credentials.username, settings.DOC_USERNAME) and secrets.compare_digest(
+            credentials.password, settings.DOC_PASSWORD):
         return get_redoc_html(
             openapi_url=app.openapi_url,
             title=app.title + " - ReDoc",
         )
 
-    return responseService.error_403('wrong username or password given')    
+    return responseService.error_403('wrong username or password given')
