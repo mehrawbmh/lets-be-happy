@@ -1,5 +1,7 @@
 from typing import NoReturn
 
+from app.core.enum.logger import Logger
+from app.core.services.log_service import logService
 from app.models.entity import Entity
 
 
@@ -13,4 +15,4 @@ class DatabaseIndexManager:
         for entity in Entity.__subclasses__():
             await entity.create_indexes()
 
-        # print("indexes were created successfully")
+        logService.get_logger(Logger.STARTUP).info('db indexes created successfully.')

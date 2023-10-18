@@ -1,6 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.configs.settings import settings
+from app.core.services.log_service import logService
 from app.core.services.service import Service
 
 
@@ -19,9 +20,9 @@ class MongoClient(Service):
         port = getattr(settings, "MONGO_PORT", "27017")
         if username and password:  # it means there's auth!
             connection_uri = f"mongodb://{username}:{password}@{host_name}:27017/"
-            # print('here MONGO using password')
+            logService.logger.debug('doing mongo auth using password')
         else:
-            # print('here with NO AUTH MONGO')
+            logService.logger.warning('getting db without any authentication!')
             connection_uri = f"mongodb://{host_name}:27017/"
         return connection_uri
 
@@ -41,7 +42,8 @@ class MongoClient(Service):
                 self.__db = self.__client.get_database(settings.MONGO_DB)
             else:
                 self.__db = self.__client[settings.MONGO_DB]
-                # print("WARNING>>> creating DB!")
+                logService.get_logger('start up events').warning("creating database %s from scratch!",
+                                                                 settings.MONGO_DB)
                 await self.__db["init"].update_one({}, {"$set": {"OK": 1}}, upsert=True)
 
         return self.__db
