@@ -13,4 +13,4 @@ class DatabaseIndexManager:
         for entity in Entity.__subclasses__():
             await entity.create_indexes()
 
-        print("indexes were created successfully")
+        # print("indexes were created successfully")

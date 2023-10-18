@@ -19,9 +19,9 @@ class MongoClient(Service):
         port = getattr(settings, "MONGO_PORT", "27017")
         if username and password:  # it means there's auth!
             connection_uri = f"mongodb://{username}:{password}@{host_name}:27017/"
-            print('here MONGO using password')
+            # print('here MONGO using password')
         else:
-            print('here with NO AUTH MONGO')
+            # print('here with NO AUTH MONGO')
             connection_uri = f"mongodb://{host_name}:27017/"
         return connection_uri
 
@@ -41,7 +41,7 @@ class MongoClient(Service):
                 self.__db = self.__client.get_database(settings.MONGO_DB)
             else:
                 self.__db = self.__client[settings.MONGO_DB]
-                print("WARNING>>> creating DB!")
+                # print("WARNING>>> creating DB!")
                 await self.__db["init"].update_one({}, {"$set": {"OK": 1}}, upsert=True)
 
         return self.__db
