@@ -76,7 +76,7 @@ class User(Entity):
     @field_validator('phone')
     @classmethod
     def validate_phone_number(cls, phone: str, info: ValidationInfo):
-        if phone.startswith('09') and len(phone) == 11:
+        if phone.startswith('09') and len(phone) == 11 and phone.isnumeric():
             return phone
 
         return responseService.error_400('bad phone number given')
