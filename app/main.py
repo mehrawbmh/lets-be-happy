@@ -12,6 +12,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from app.configs.settings import settings
 from app.core.database.indexes import DatabaseIndexManager
 from app.core.enum.event_types import EventTypes
+from app.core.services.log_service import logService
 from app.core.services.response_service import responseService
 from app.dependencies.database import get_main_db
 from app.endpoints.tasks import router as tasks_router
@@ -31,6 +32,7 @@ async def health_test(name: str, message: str = '', db: AsyncIOMotorDatabase = D
     resp = {
         'message': f"Hello {name}. It seems working fine ^_^. {message}"
     }
+    logService.logger.debug('everything seems fine')
     return JSONResponse(resp, 200)
 
 
