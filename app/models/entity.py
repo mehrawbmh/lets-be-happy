@@ -92,11 +92,12 @@ class Entity(Model, ABC):
     
     async def update(self, exclude: set = {}, exclude_none: bool = False) -> UpdateResult:
         """ updates the db to the current state of class """
+        exclude.add('id')
         current_dict = self.model_dump(exclude=exclude, exclude_unset=True, exclude_none=exclude_none)
         
         collection = await self.get_collection()
         try:
-            return await collection.update_one({'_id': self.id}, {'$set':current_dict})
+            return await collection.update_one({'_id': self.create_object_id(self.id)}, {'$set':current_dict})
         except DuplicateKeyError as dke:
             duplicated_fields: dict = dke.details['keyPattern']
             duplicated_field = list(duplicated_fields.keys())[0]
