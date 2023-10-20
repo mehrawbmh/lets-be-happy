@@ -3,7 +3,10 @@ from fastapi import Depends, APIRouter, HTTPException, status
 from app.core.enum.access_levels import AccessLevel
 from app.core.enum.roles import Role
 from app.core.enum.tags import Tags
+from app.core.enum.task_statuses import TaskStatus
+from app.core.services.log_service import logService 
 from app.core.services.response_service import responseService
+from app.core.services.time_service import TimeService
 from app.dependencies.user import get_staff_user, get_admin_user
 from app.models.entities.tasks import Task
 from app.models.entities.users import User
@@ -83,8 +86,16 @@ async def update_task_detail(task_id: str, user: UserTokenData = Depends(get_sta
 
 @router.patch('/{task_id}')
 async def mark_task_done(task_id: str, user: UserTokenData = Depends(get_staff_user)):
-    return responseService.error_501()
+    task = await Task.find_by_id(task_id, False, 'task not found')
 
+    if user.role == Role.ADMIN or user.username in (task.assignee, task.created_by):
+        task.status = TaskStatus.DONE
+        task.active = False
+        task.finished_at = TimeService.now()
+        result = await task.update()
+        return responseService.operation_response(result.acknowledged and result.modified_count)
+
+    return responseService.error_403('you are not allowd to do this action')
 
 @router.delete('/{task_id}')
 async def delete_task(task_id: str, just_deactivate: bool = False, user: UserTokenData = Depends(get_staff_user)):
