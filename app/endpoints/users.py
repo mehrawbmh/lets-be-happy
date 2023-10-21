@@ -103,6 +103,7 @@ async def change_user_role(promote_schema: UserPromoteSchema,
 async def update_user_info(update_schema: UserUpdateSchema, user: UserTokenData = Depends(get_current_user)):
     users_collection = await User.get_collection()
     try:
+        # TODO: validation before update!
         update_result = await users_collection.update_one({'_id': ObjectId(user.id)},
                                                           {'$set': update_schema.model_dump()})
     except DuplicateKeyError as dke:

@@ -1,10 +1,8 @@
-from fastapi import Depends, APIRouter, HTTPException, status
+from fastapi import Depends, APIRouter
 
-from app.core.enum.access_levels import AccessLevel
 from app.core.enum.roles import Role
 from app.core.enum.tags import Tags
 from app.core.enum.task_statuses import TaskStatus
-from app.core.services.log_service import logService 
 from app.core.services.response_service import responseService
 from app.core.services.time_service import TimeService
 from app.dependencies.user import get_staff_user, get_admin_user
@@ -12,6 +10,7 @@ from app.models.entities.tasks import Task
 from app.models.entities.users import User
 from app.models.schemas.auth.token_data import UserTokenData
 from app.models.schemas.task.task_create import CreateTask
+from app.models.schemas.task.task_update import TaskUpdateSchema
 
 router = APIRouter(prefix='/tasks', tags=[Tags.TASK])
 
@@ -80,7 +79,9 @@ async def get_task_detail(task_id: str, user: UserTokenData = Depends(get_staff_
 
 
 @router.put('/{task_id}')
-async def update_task_detail(task_id: str, user: UserTokenData = Depends(get_staff_user)):
+async def update_task_detail(update_schema: TaskUpdateSchema, task_id: str,
+                             user: UserTokenData = Depends(get_staff_user)):
+    existing_task = await Task.find_by_id(task_id, False, 'task not found')
     return responseService.error_501()
 
 
