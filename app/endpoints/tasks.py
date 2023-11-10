@@ -98,6 +98,7 @@ async def mark_task_done(task_id: str, user: UserTokenData = Depends(get_staff_u
 
     return responseService.error_403('you are not allowd to do this action')
 
+
 @router.delete('/{task_id}')
 async def delete_task(task_id: str, just_deactivate: bool = False, user: UserTokenData = Depends(get_staff_user)):
     task = await Task.find_by_id(task_id, False)

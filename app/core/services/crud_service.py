@@ -29,3 +29,6 @@ class CrudService(Service):
     async def read_one(self, entity_id: str):
         return await self.entity_class.find_by_id(entity_id, allow_none=False)
     
+    async def read_many(self, entity_ids: list[str]):
+        return await self.entity_class.find_by_ids()
+    

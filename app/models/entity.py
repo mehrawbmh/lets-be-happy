@@ -62,6 +62,11 @@ class Entity(Model, ABC):
 
         return cls.model_validate({**db_data, 'id': str(db_data['_id'])}) if db_data else None
 
+    async def find_by_ids(cls, document_ids: list[str]) -> dict:
+        collection = await cls.get_collection()
+        db_data = await collection.find({"_id": {"$in": document_ids}}).to_list(len(document_ids))
+
+
     @classmethod
     async def list_find_many(cls, condition: dict, max_length: int = 1000) -> list[Self]:
         """ Simple find_many with converting it to list of entities, not the most optimized way but handy! """
