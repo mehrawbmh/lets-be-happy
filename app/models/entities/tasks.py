@@ -23,6 +23,13 @@ class Task(Entity):
             background=True
         )
 
+    @classmethod
+    async def get_all_tasks(cls) -> list[Task]:
+        collection = await cls.get_collection()
+        cursor = collection.find({})
+        tasks = await cursor.to_list(length=None)
+        return [cls(**task) for task in tasks]
+
     title: str
     created_by: str  # username # TODO: is it better idea to change it to user id?!
     assignee: str  # username
